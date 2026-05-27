@@ -1,5 +1,32 @@
 const express = require("express");
-const app = express();
+const path    = require("path");
+const app     = express();
+
+app.use((req, res, next) => {
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self' https://fonts.googleapis.com",
+      "font-src https://fonts.gstatic.com",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+    ].join("; ")
+  );
+  res.setHeader("Access-Control-Allow-Origin", "");
+  next();
+});
+
+const publicDir = path.join(__dirname, "public");
+app.use(express.static(publicDir, { index: "index.html" }));
+
+app.disable("x-powered-by");
 
 const quotes = [
   {
@@ -72,10 +99,10 @@ const quotes = [
   },
 ];
 
-app.get("/", (req, res) => {
+app.get("/random", (req, res) => {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
-  res.send(randomQuote);
+  res.json(randomQuote);
 });
 
 app.get("/allQuotes", (req, res) => {
@@ -83,14 +110,18 @@ app.get("/allQuotes", (req, res) => {
 });
 
 app.get("/quote/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const quote = quotes.find((q) => q.id == id);
-  if (!quote) {
-    return res.status(404).json({ error: "id not found" });
+  const raw = req.params.id;
+  const id  = parseInt(raw, 10);
+  if (isNaN(id) || id < 1 || String(id) !== raw) {
+    return res.status(400).json({ error: "Invalid ID format." });
   }
-  res.send(quote);
+  const quote = quotes.find((q) => q.id === id);
+  if (!quote) {
+    return res.status(404).json({ error: "Quote not found." });
+  }
+  res.json(quote);
 });
 
 app.listen(3000, () => {
-  console.log(" Succesfully Connected to PORT");
+  console.log("Server running → http://localhost:3000");
 });
