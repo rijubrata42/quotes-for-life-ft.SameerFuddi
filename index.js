@@ -72,7 +72,7 @@ const quotes = [
   },
 ];
 
-app.get("/quote", (req, res) => {
+app.get("/", (req, res) => {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
   res.send(randomQuote);
