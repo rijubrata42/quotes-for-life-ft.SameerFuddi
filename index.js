@@ -1,5 +1,6 @@
 const express = require("express");
 const path    = require("path");
+const { text } = require("stream/consumers");
 const app     = express();
 
 app.use((req, res, next) => {
@@ -97,6 +98,18 @@ const quotes = [
     id: 17,
     text: "Tamatar Khao Khun Badhao Aur Badhao Hosla, M*th Maro l*nd badhao fad dalo bho*da!",
   },
+  {
+    id:18,
+    text:"Na maru mai peeth pe mukka na naapu mai lulli baaton se hi gaand maar du naam hai mera fuddy"
+  },
+  {
+    id:19,
+    text:"pyaar bawasir ki tarah hota hai ek Baar hota hai par Dard Bohot deta hai"
+  },
+  {
+    id:20,
+    text: "agar nasib haato mai likha hota to log uss se apna bund nahi dhote.."
+  }
 ];
 
 app.get("/random", (req, res) => {
